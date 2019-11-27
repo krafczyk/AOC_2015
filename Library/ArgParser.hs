@@ -7,8 +7,8 @@ type ArgName = String
 type ArgHandles = [String]
 type ArgHelptext = String
 type EasyArgDefinitions = (String, [String], String, Int)
-data ArgDefinitions = ArgDefinitions { name :: ArgName, handles :: ArgHandles, helpText :: ArgHelptext, numArgs :: Int }
-data ProgramArguments = ProgramArguments { progTitle :: String, argDefs :: [ArgDefinitions] }
+data ArgDefinitions = ArgDefinitions { name :: ArgName, handles :: ArgHandles, helpText :: ArgHelptext, numArgs :: Int } deriving (Show)
+data ProgramArguments = ProgramArguments { progTitle :: String, argDefs :: [ArgDefinitions] } deriving (Show)
 
 helpArgDef :: ArgDefinitions
 helpArgDef = ArgDefinitions { name="help",
@@ -65,11 +65,27 @@ writeHelpText progArgs = do
                          putStrLn $ "Accepts arguments"
                          mapM_ (printArgDef) $ argDefs progArgs
 
---getNamePositions :: String -> [String] -> [Int]
---getNamePositions name args = fold (\x acc -> ) (0, []) args
+getNamePositions :: [String] -> [String] -> [Int]
+getNamePositions names args = map fst $ filter (\(_,n) -> n `elem` names) $ zip [0..] args
 
---argFoldFunc :: (Int, String, [String], Map String [[String]]) -> String -> (Int, String, [String], Map String [[String]])
---argFoldFunc (State, 
+helpPresent :: ProgramArguments -> [String] -> Bool
+helpPresent progArgs args = let help_handles = foldl (++) [] $ map (\x -> handles x) $ filter (\x -> name x == "help") $ argDefs progArgs in
+                            not $ null $ getNamePositions help_handles args
+
+getArgByName :: ProgramArguments -> String -> ArgDefinitions
+getArgByName progArgs argname = (filter (\x -> name x == argname) $ argDefs progArgs) !! 0
+
+doArgsSupport :: ArgDefinitions -> Int -> [String] -> Bool
+doArgsSupport argDef idx args = let num_req = numArgs argDef in
+                                if length (take num_req (drop (idx+1) args)) == num_req
+                                    then True
+                                    else False
 
 --parseArguments :: ProgramArguments -> [String] -> Either String (Map String [[String]])
---parseArguments progArgs args = 
+parseArguments progArgs args = let name_handle_pairs = map (\x -> (name x, handles x)) $ filter (\x -> name x /= "help") $ argDefs progArgs
+                                   name_idx_pairs = map (\(name, handles) -> (name, getNamePositions handles args)) name_handle_pairs
+                                   support_check_a = map (\(name, idxs) -> (name, map (\idx -> doArgsSupport (getArgByName progArgs name) idx args) idxs )) name_idx_pairs
+                                   support_check = map (\(name, support) -> name) $ filter (\(name, support) -> if not $ foldl (&&) True support then True else False ) $ support_check_a in
+                               if not . null $ support_check
+                                   then "ArgParser ERROR: argument names " ++ (intercalate "," support_check) ++ " not given enough arguments!"
+                                   else "Continue"
