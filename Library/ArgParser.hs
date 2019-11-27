@@ -17,9 +17,10 @@ helpArgDef = ArgDefinitions { name="help",
                               numArgs=0 }
 
 buildProgArgFunc :: EasyArgDefinitions -> ArgDefinitions
-buildProgArgFunc (name, handles, helptext) = ArgDefinitions { name=name,
-                                                              handles=handles,
-                                                              helpText=helptext }
+buildProgArgFunc (name, handles, helptext, num) = ArgDefinitions { name=name,
+                                                                   handles=handles,
+                                                                   helpText=helptext,
+                                                                   numArgs=num }
 
 checkForRepeated :: [String] -> Maybe String
 checkForRepeated list = let (test, val, _) = foldl (\(test, val, accl) x ->
@@ -36,11 +37,11 @@ checkForRepeated list = let (test, val, _) = foldl (\(test, val, accl) x ->
                             Nothing
 
 argNameConflicts :: [EasyArgDefinitions] -> Maybe String
-argNameConflicts easyargs = let arg_names = map (\(n, _, _) -> n) easyargs in
+argNameConflicts easyargs = let arg_names = map (\(n, _, _, _) -> n) easyargs in
                             checkForRepeated arg_names
 
 argHandleConflicts :: [EasyArgDefinitions] -> Maybe String
-argHandleConflicts easyargs = let handle_names = foldr (\x acc -> x++acc) [] $ map (\(_, h, _) -> h) easyargs in
+argHandleConflicts easyargs = let handle_names = foldr (\x acc -> x++acc) [] $ map (\(_, h, _, _) -> h) easyargs in
                               checkForRepeated handle_names
 
 buildProgramArguments :: String -> [EasyArgDefinitions] -> Either String ProgramArguments
@@ -64,11 +65,11 @@ writeHelpText progArgs = do
                          putStrLn $ "Accepts arguments"
                          mapM_ (printArgDef) $ argDefs progArgs
 
-getNamePositions :: String -> [String] -> [Int]
-getNamePositions name args = fold (\x acc -> ) (0, []) args
+--getNamePositions :: String -> [String] -> [Int]
+--getNamePositions name args = fold (\x acc -> ) (0, []) args
 
-argFoldFunc :: (Int, String, [String], Map String [[String]]) -> String -> (Int, String, [String], Map String [[String]])
-argFoldFunc (State, 
+--argFoldFunc :: (Int, String, [String], Map String [[String]]) -> String -> (Int, String, [String], Map String [[String]])
+--argFoldFunc (State, 
 
-parseArguments :: ProgramArguments -> [String] -> Either String (Map String [[String]])
-parseArguments progArgs args = 
+--parseArguments :: ProgramArguments -> [String] -> Either String (Map String [[String]])
+--parseArguments progArgs args = 
