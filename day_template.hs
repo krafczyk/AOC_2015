@@ -22,7 +22,7 @@ argHelpHandler progArgs args = if AP.helpPresent progArgs args
 
 main = do
        args <- getArgs
-       let progArgCont = AP.buildProgramArguments "day_1 Solves Advent of Code 2015 Day 1" argDefinitions
+       let progArgCont = AP.buildProgramArguments "Day template" argDefinitions
        case progArgCont of
            Left msg -> putStrLn msg
            Right progArgs -> argHelpHandler progArgs args
