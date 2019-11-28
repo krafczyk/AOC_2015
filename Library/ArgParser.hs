@@ -91,4 +91,5 @@ parseArguments progArgs args = let name_handle_pairs = map (\x -> (name x, handl
                                    else let support_check_2 = map (\(n,x) -> n) $ filter (\(n, x) -> not x) $ map (\(n,x) -> (n, foldl (&&) True $ map (>0) x)) $ filter (\(n,x) -> not . null $ x) $ map (\(n,x) -> (n, map (\(a,b) -> a-b-(numArgs $ getArgByName progArgs n)) $ zip (drop 1 x) (reverse . drop 1 . reverse $ x))) name_idx_pairs in
                                        if not . null $ support_check_2
                                            then Left $ "ArgParser ERROR: argument names " ++ (intercalate "," support_check_2) ++ " not enough space between arguments!"
-                                           else Left $ "Continue"
+                                           else let map_build_data = filter (\(n, items) -> not . null $ items) $ map (\(n, idxs) -> let num_args = numArgs $ getArgByName progArgs n in (n, map (\idx -> map (args !!) $ map (idx+) $ take num_args [1..]) idxs)) name_idx_pairs in
+                                                Right $ Map.fromList map_build_data
