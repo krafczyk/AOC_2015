@@ -12,11 +12,17 @@ part_1 problem_data = let area_map = map (\[l, w, h] -> [l*w, l*h, w*h]) problem
                           pres_area = map (\x -> 2*sum x) area_map in
                       sum $ map (\(min,pres)-> min+pres) $ zip min_area pres_area
 
+part_2 problem_data = let peri_map = map (\[l, w, h] -> [2*(l+w), 2*(l+h), 2*(w+h)]) problem_data
+                          min_peri = map (minimum) peri_map
+                          vol = map (\[l, w, h] -> l*w*h) problem_data in
+                      sum $ map (\(peri,vol) -> peri+vol) $ zip min_peri vol
+
 handleFile :: String -> IO ()
 handleFile input_filepath = withFile input_filepath ReadMode (\handle -> do
                                                                          file_data <- hGetContents handle
                                                                          let problem_data = map (\vals -> map (\x -> read x ::Int) vals) $ map (splitOn "x") $ lines file_data
-                                                                         putStrLn $ show $ part_1 problem_data)
+                                                                         putStrLn $ "Part 1: " ++ (show $ part_1 problem_data)
+                                                                         putStrLn $ "Part 2: " ++ (show $ part_2 problem_data))
 
 argHelpHandler progArgs args = if AP.helpPresent progArgs args
                                    then AP.writeHelpText progArgs
