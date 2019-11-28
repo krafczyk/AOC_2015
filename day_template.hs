@@ -5,6 +5,11 @@ import qualified Library.ArgParser as AP
 
 argDefinitions = [ ("input_filepath", ["-i", "--input-file"], "Filepath to use for input", 1) ]
 
+handleFile :: String -> IO ()
+handleFile input_filepath = withFile input_filepath ReadMode (\handle -> do
+                                                                         file_data <- hGetContents handle
+                                                                         -- Read problem data in here)
+
 argHelpHandler progArgs args = if AP.helpPresent progArgs args
                                    then AP.writeHelpText progArgs
                                    else let parse_result = AP.parseArguments progArgs args in
