@@ -45,8 +45,15 @@ convertToWord32 = map (\x -> fromIntegral x :: Word32)
 md5s = foldl (++) [] . foldl (++) [] . map (replicate 4) $ md5s_pieces
 md5K = convertToWord32 . map (floor) . map ((2^32)*) . map (abs) . map (sin) . map (+1) $ take 64 [0..]
 
-md5initInput input = let bitlength = 8*(length input) in
-                     bitlength
+md5initInput input = let num_bytes = 512 `div` 8
+                         bitlength = 8*(length input)
+                         num_existing_blocks = bitlength `div` 512 in
+                         --num_initial_bytes = bitlength `div` 8
+                         --len_mod = bitlength `mod` 512
+                         --byte_mod = num_initial_bytes `mod` num_bytes
+                         --init_pad = 128 :: Word8
+                         --num_zero_pad = 512 - ((num_initial_bytes+1+8) `mod` num_bytes) in
+                     num_existing_blocks
 
 build_complete :: String -> Int -> String
 build_complete key n = key ++ show n
